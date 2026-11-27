@@ -1,0 +1,28 @@
+name: Unzip Project
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unzip
+        run: |
+          unzip -o R_Gaming_Jone_BD_Final_Project.zip -d temp_unzip
+          shopt -s dotglob
+          # যদি ভিতরে একটা ফোল্ডার থাকে, তার ভিতরের ফাইলগুলো উপরে আনো
+          if [ $(ls -1 temp_unzip | wc -l) -eq 1 ] && [ -d temp_unzip/* ]; then
+            mv temp_unzip/*/* . 2>/dev/null || mv temp_unzip/*/ . 2>/dev/null
+          else
+            mv temp_unzip/* . 2>/dev/null
+          fi
+          rm -rf temp_unzip R_Gaming_Jone_BD_Final_Project.zip .github/workflows/unzip.yml
+          ls -la
+      - name: Commit files
+        run: |
+          git config user.name "coinovaa-bd"
+          git config user.email "coinovaa-bd@users.noreply.github.com"
+          git add -A
+          git commit -m "Unzip project files" || echo "nothing to commit"
+          git push
